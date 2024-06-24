@@ -1,25 +1,27 @@
-fn main() -> u32 {
-    fib(16)
-}
+// SPDX-License-Identifier: MIT
+// Compatible with OpenZeppelin Contracts for Cairo ^0.14.0
 
-fn fib(mut n: u32) -> u32 {
-    let mut a: u32 = 0;
-    let mut b: u32 = 1;
-    while n != 0 {
-        n = n - 1;
-        let temp = b;
-        b = a + b;
-        a = temp;
-    };
-    a
-}
+#[starknet::contract]
+mod StarSafe {
 
-#[cfg(test)]
-mod tests {
-    use super::fib;
+    use starknet::get_caller_address;
+    use starknet::ContractAddress;
 
-    #[test]
-    fn it_works() {
-        assert(fib(16) == 987, 'it works!');
+
+
+    #[storage]
+    struct Storage {
+        owner: ContractAddress,
+        whitelist: LegacyMap::<ContractAddress, bool>,
+        withdrawal_limits: LegacyMap::<ContractAddress, u256>,
+        last_withdrawal: LegacyMap::<ContractAddress, u64>,
+        balances: LegacyMap::<(ContractAddress, ContractAddress), u256>, // (user, token) -> balance
     }
+
+    #[event]
+    fn Deposit(user: ContractAddress, token: ContractAddress, amount: u256) {}
+
+    #[event]
+    fn Withdrawal(user: ContractAddress, token: ContractAddress, amount: u256) {}
+
 }
